@@ -1,0 +1,119 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime? @map(name: "email_verified")
+  password      String
+  role          String    @default("USER")
+  createdAt     DateTime  @default(now()) @map(name: "created_at")
+  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+  sessions      Session[]
+  accounts      Account[]
+
+  @@map(name: "users")
+}
+
+// Session model for user sessions
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map(name: "session_token")
+  userId       String   @map(name: "user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now()) @map(name: "created_at")
+  updatedAt    DateTime @updatedAt @map(name: "updated_at")
+
+  @@map(name: "sessions")
+}
+
+// Account model for OAuth connections
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String  @map(name: "user_id")
+  type               String
+  provider           String
+  providerAccountId  String  @map(name: "provider_account_id")
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime @default(now()) @map(name: "created_at")
+  updatedAt         DateTime @updatedAt @map(name: "updated_at")
+
+  @@unique([provider, providerAccountId])
+  @@map(name: "accounts")
+}
+
+// Verification token model for email verification
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map(name: "verification_tokens")
+}
+
+// Patient model
+model Patient {
+  id          String     @id @default(cuid())
+  name        String
+  dateOfBirth DateTime   @map(name: "date_of_birth")
+  gender      String
+  contact     String
+  address     String?
+  createdAt   DateTime   @default(now()) @map(name: "created_at")
+  updatedAt   DateTime   @updatedAt @map(name: "updated_at")
+  teeth       Tooth[]
+  treatments  Treatment[]
+
+  @@map(name: "patients")
+}
+
+// Tooth model
+model Tooth {
+  id        String   @id @default(cuid())
+  number    Int
+  status    String
+  patientId String   @map(name: "patient_id")
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  @@map(name: "teeth")
+}
+
+// Treatment model
+model Treatment {
+  id          String   @id @default(cuid())
+  date        DateTime
+  description String
+  type        String?
+  patientId   String   @map(name: "patient_id")
+  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  teeth       Json     // Array of tooth numbers
+  notes       String?
+  cost        Float?
+  performedBy String?  @map(name: "performed_by")
+  createdAt   DateTime @default(now()) @map(name: "created_at")
+  updatedAt   DateTime @updatedAt @map(name: "updated_at")
+
+  @@map(name: "treatments")
+}
