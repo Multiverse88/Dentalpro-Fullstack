@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card } from "@/components/ui/Card";
 import { useDebounce } from '@/hooks/useDebounce';
 import { PatientTable } from '@/components/patients/PatientTable';
 import { SearchInput } from '@/components/ui/SearchInput';

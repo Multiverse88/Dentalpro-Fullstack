@@ -10,16 +10,6 @@ import { AddTreatmentModal } from "@/components/patients/AddTreatmentModal";
 import Link from "next/link";
 import { ArrowLeft, User, Calendar, Phone, MapPin, Plus } from "lucide-react";
 
-interface Patient {
-  id: string;
-  name: string;
-  dateOfBirth: Date;
-  gender: string;
-  contact: string;
-  address: string | null;
-  treatments: Treatment[];
-}
-
 interface Treatment {
   id: string;
   date: Date;
@@ -43,6 +33,7 @@ export default function PatientDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [patient, setPatient] = useState<any>(null);
   const [teethConditions, setTeethConditions] = useState<ToothCondition[]>([]);
   const [isAddTreatmentModalOpen, setIsAddTreatmentModalOpen] = useState(false);

@@ -75,7 +75,7 @@ export default function CalendarPage() {
 
   useEffect(() => {
     loadTreatments(currentYear, currentMonth);
-  }, []); // Only run on initial mount
+  }, [currentYear, currentMonth, loadTreatments]); // Include dependencies
 
   if (loading) {
     return (
