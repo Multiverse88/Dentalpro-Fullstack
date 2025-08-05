@@ -1,17 +1,56 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
-import { Upload, Download, Database, Users, FileText, Settings as SettingsIcon, LogOut, Shield, User } from 'lucide-react';
+import { Upload, Download, Database, Users, FileText, Settings as SettingsIcon, LogOut, Shield, User, Calendar, RefreshCw } from 'lucide-react';
 import { ImportPatientsModal } from '@/components/settings/ImportPatientsModal';
 import { ExportPatientsModal } from '@/components/settings/ExportPatientsModal';
 import { signOut, useSession } from 'next-auth/react';
+
+interface SystemStats {
+  totalPatients: number;
+  totalTreatments: number;
+  recentTreatments: number;
+  database: {
+    provider: string;
+    status: string;
+  };
+}
 
 export default function SettingsPage() {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [stats, setStats] = useState<SystemStats | null>(null);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+  const [statsError, setStatsError] = useState<string | null>(null);
   const { data: session } = useSession();
+
+  // Fetch system statistics
+  const fetchStats = async () => {
+    setIsLoadingStats(true);
+    setStatsError(null);
+    try {
+      const response = await fetch('/api/statistics');
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data.statistics);
+      } else {
+        setStatsError('Failed to load statistics');
+      }
+    } catch (error) {
+      console.error('Failed to fetch statistics:', error);
+      setStatsError('Network error');
+    } finally {
+      setIsLoadingStats(false);
+    }
+  };
+
+  useEffect(() => {
+    if (session) {
+      fetchStats();
+    }
+  }, [session]);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -127,28 +166,85 @@ export default function SettingsPage() {
       {/* System Information */}
       <Card variant="default">
         <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <Database className="w-5 h-5 mr-2" />
-            Informasi Sistem
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+              <Database className="w-5 h-5 mr-2" />
+              Informasi Sistem
+            </h3>
+            <button
+              onClick={fetchStats}
+              disabled={isLoadingStats}
+              className="flex items-center space-x-1 px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${isLoadingStats ? 'animate-spin' : ''}`} />
+              <span>Refresh</span>
+            </button>
+          </div>
+          
+          {statsError && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-700">Error: {statsError}</p>
+            </div>
+          )}
           
           <div className="grid gap-4 md:grid-cols-3">
             <div className="text-center p-4 bg-gray-50 rounded-lg">
               <Users className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-800">--</div>
+              <div className="text-2xl font-bold text-gray-800">
+                {isLoadingStats ? (
+                  <div className="animate-pulse bg-gray-300 h-6 w-8 mx-auto rounded"></div>
+                ) : (
+                  stats?.totalPatients.toLocaleString('id-ID') || '0'
+                )}
+              </div>
               <div className="text-sm text-gray-600">Total Pasien</div>
             </div>
             
             <div className="text-center p-4 bg-gray-50 rounded-lg">
               <FileText className="w-8 h-8 text-green-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-800">--</div>
+              <div className="text-2xl font-bold text-gray-800">
+                {isLoadingStats ? (
+                  <div className="animate-pulse bg-gray-300 h-6 w-8 mx-auto rounded"></div>
+                ) : (
+                  stats?.totalTreatments.toLocaleString('id-ID') || '0'
+                )}
+              </div>
               <div className="text-sm text-gray-600">Total Perawatan</div>
             </div>
             
             <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <Database className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-800">Neon</div>
-              <div className="text-sm text-gray-600">Database</div>
+              <Calendar className="w-8 h-8 text-orange-600 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-gray-800">
+                {isLoadingStats ? (
+                  <div className="animate-pulse bg-gray-300 h-6 w-8 mx-auto rounded"></div>
+                ) : (
+                  stats?.recentTreatments.toLocaleString('id-ID') || '0'
+                )}
+              </div>
+              <div className="text-sm text-gray-600">
+                Perawatan {new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
+              </div>
+            </div>
+          </div>
+          
+          {/* Database Status */}
+          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Database className="w-5 h-5 text-blue-600 mr-2" />
+                <div>
+                  <div className="font-medium text-blue-900">
+                    {isLoadingStats ? 'Loading...' : stats?.database.provider || 'Database'}
+                  </div>
+                  <div className="text-sm text-blue-700">
+                    Status: {isLoadingStats ? 'Checking...' : stats?.database.status || 'Unknown'}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                <span className="text-sm text-green-700 font-medium">Connected</span>
+              </div>
             </div>
           </div>
         </div>
