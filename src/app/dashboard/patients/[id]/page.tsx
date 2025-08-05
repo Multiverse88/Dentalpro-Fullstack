@@ -40,6 +40,7 @@ export default function PatientDetailPage({
   const [editTreatment, setEditTreatment] = useState<Treatment | null>(null);
   const [selectedTeeth, setSelectedTeeth] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Calculate age
   const calculateAge = (birthDate: Date) => {
@@ -73,19 +74,32 @@ export default function PatientDetailPage({
   }, [params]);
 
   const handleTreatmentAdded = async () => {
+    // Show refreshing state
+    setRefreshing(true);
+    
     // Refresh patient data after adding treatment
     try {
       const { id } = await params;
+      console.log('Refreshing patient data after treatment update...');
+      
+      // Add small delay to ensure database is updated
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       const [patientData, teethData] = await Promise.all([
         getPatientById(id),
         getPatientTeethConditions(id)
       ]);
+      
+      console.log('New teeth data:', teethData);
       setPatient(patientData);
       setTeethConditions(teethData);
+      
       // Clear selected teeth after successful treatment addition
       setSelectedTeeth([]);
     } catch (error) {
       console.error('Error refreshing patient data:', error);
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -235,7 +249,15 @@ export default function PatientDetailPage({
           {/* Odontogram with selection */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-xl font-semibold text-gray-800">Peta Gigi (Odontogram)</h3>
+              <h3 className="text-xl font-semibold text-gray-800 flex items-center">
+                Peta Gigi (Odontogram)
+                {refreshing && (
+                  <div className="ml-3 flex items-center text-blue-600">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    <span className="ml-2 text-sm">Memperbarui...</span>
+                  </div>
+                )}
+              </h3>
               {selectedTeeth.length > 0 && (
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-600">
@@ -252,6 +274,7 @@ export default function PatientDetailPage({
               )}
             </div>
             <Odontogram 
+              key={`odontogram-${teethConditions.length}-${refreshing ? 'refreshing' : 'idle'}`}
               teeth={teethConditions} 
               readOnly={false}
               selectedTeeth={selectedTeeth}

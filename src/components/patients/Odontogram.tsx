@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface ToothCondition {
   number: number;
@@ -25,10 +25,17 @@ export function Odontogram({
   onSelectionChange 
 }: OdontogramProps) {
   const [internalSelectedTeeth, setInternalSelectedTeeth] = useState<number[]>([]);
+  const [lastUpdate, setLastUpdate] = useState<number>(Date.now());
   
   // Use external selection if provided, otherwise use internal state
   const selectedTeeth = externalSelectedTeeth || internalSelectedTeeth;
   const setSelectedTeeth = onSelectionChange || setInternalSelectedTeeth;
+
+  // Update timestamp when teeth data changes to force re-render
+  useEffect(() => {
+    setLastUpdate(Date.now());
+    console.log('Odontogram updated with new teeth data:', teeth.length, 'conditions');
+  }, [teeth]);
 
   // Standard FDI notation for permanent teeth
   const upperTeeth = [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28];

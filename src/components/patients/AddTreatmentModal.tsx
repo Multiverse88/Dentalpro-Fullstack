@@ -179,7 +179,7 @@ export function AddTreatmentModal({
       showToast({
         type: 'success',
         title: `Perawatan berhasil ${isEditMode ? 'diupdate' : 'ditambahkan'}`,
-        message: `Perawatan ${formData.type} untuk ${patientName} telah ${isEditMode ? 'diperbarui' : 'disimpan'}`,
+        message: `Perawatan ${formData.type} untuk ${patientName} telah ${isEditMode ? 'diperbarui' : 'disimpan'}. Odontogram akan diperbarui...`,
       });
 
       // Reset form
@@ -192,8 +192,13 @@ export function AddTreatmentModal({
         cost: '',
       });
       
+      // Call onTreatmentAdded first to refresh data
       onTreatmentAdded();
-      onClose();
+      
+      // Small delay before closing to ensure data refresh is initiated
+      setTimeout(() => {
+        onClose();
+      }, 100);
     } catch (error) {
       console.error(`Error ${isEditMode ? 'updating' : 'adding'} treatment:`, error);
       showToast({

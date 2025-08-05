@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 
 export async function getPatientTeethConditions(patientId: string) {
   try {
+    console.log(`[${new Date().toISOString()}] Fetching teeth conditions for patient ${patientId}`);
+    
     // Get all treatments for the patient
     const treatments = await prisma.treatment.findMany({
       where: {
@@ -82,7 +84,8 @@ export async function getPatientTeethConditions(patientId: string) {
     });
 
     const result = Array.from(teethConditions.values());
-    console.log(`Processed ${result.length} teeth conditions`);
+    console.log(`[${new Date().toISOString()}] Processed ${result.length} teeth conditions for patient ${patientId}`);
+    console.log('Teeth conditions:', result.map(t => `${t.number}:${t.condition}`).join(', '));
     
     return result;
   } catch (error) {
