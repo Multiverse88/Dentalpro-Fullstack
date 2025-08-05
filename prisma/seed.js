@@ -21,8 +21,6 @@ async function main() {
   await prisma.treatment.deleteMany({});
   await prisma.tooth.deleteMany({});
   await prisma.patient.deleteMany({});
-  await prisma.session.deleteMany({});
-  await prisma.account.deleteMany({});
   await prisma.user.deleteMany({});
 
   // Data gigi akan dibuat untuk setiap pasien nanti

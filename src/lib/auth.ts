@@ -13,26 +13,24 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Invalid credentials");
+          return null;
         }
 
         const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email
-          }
+          where: { email: credentials.email }
         });
 
-        if (!user || !user?.password) {
-          throw new Error("Invalid credentials");
+        if (!user || !user.password) {
+          return null;
         }
 
-        const isCorrectPassword = await bcrypt.compare(
+        const isValidPassword = await bcrypt.compare(
           credentials.password,
           user.password
         );
 
-        if (!isCorrectPassword) {
-          throw new Error("Invalid credentials");
+        if (!isValidPassword) {
+          return null;
         }
 
         return {
@@ -46,7 +44,8 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   session: {
-    strategy: "jwt"
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60, // 24 hours
   },
   pages: {
     signIn: "/login",
@@ -61,12 +60,12 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (session?.user) {
+      if (session?.user && token) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
         session.user.emailVerified = token.emailVerified as Date | null;
       }
       return session;
-    }
+    },
   }
 };
