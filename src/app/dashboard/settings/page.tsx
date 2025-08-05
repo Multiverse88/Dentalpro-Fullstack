@@ -2,13 +2,29 @@
 
 import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
-import { Upload, Download, Database, Users, FileText, Settings as SettingsIcon } from 'lucide-react';
+import { Upload, Download, Database, Users, FileText, Settings as SettingsIcon, LogOut, Shield, User } from 'lucide-react';
 import { ImportPatientsModal } from '@/components/settings/ImportPatientsModal';
 import { ExportPatientsModal } from '@/components/settings/ExportPatientsModal';
+import { signOut, useSession } from 'next-auth/react';
 
 export default function SettingsPage() {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { data: session } = useSession();
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await signOut({ 
+        callbackUrl: '/login',
+        redirect: true 
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -137,6 +153,96 @@ export default function SettingsPage() {
           </div>
         </div>
       </Card>
+
+      {/* Security & Account Section */}
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Keamanan & Akun</h2>
+        
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Account Info */}
+          <Card variant="default">
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <User className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-lg font-semibold text-gray-800">Informasi Akun</h3>
+                  <p className="text-sm text-gray-600">Detail akun dan sesi login</p>
+                </div>
+              </div>
+              
+              <div className="space-y-3 mb-4">
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="text-sm text-gray-600">Email:</span>
+                  <span className="text-sm font-medium text-gray-800">{session?.user?.email || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="text-sm text-gray-600">Nama:</span>
+                  <span className="text-sm font-medium text-gray-800">{session?.user?.name || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="text-sm text-gray-600">Role:</span>
+                  <span className="text-sm font-medium text-gray-800">{session?.user?.role || 'USER'}</span>
+                </div>
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-sm text-gray-600">Status Sesi:</span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    Aktif (24 jam)
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Logout Section */}
+          <Card variant="default">
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                  <Shield className="w-6 h-6 text-red-600" />
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-lg font-semibold text-gray-800">Keamanan Sesi</h3>
+                  <p className="text-sm text-gray-600">Kelola sesi login Anda</p>
+                </div>
+              </div>
+              
+              <div className="space-y-3 mb-6">
+                <div className="p-3 bg-blue-50 rounded-lg">
+                  <h4 className="text-sm font-medium text-blue-800 mb-1">
+                    Info Sesi JWT
+                  </h4>
+                  <ul className="text-xs text-blue-700 space-y-1">
+                    <li>• Sesi tersimpan di browser cookie</li>
+                    <li>• Otomatis logout setelah 24 jam</li>
+                    <li>• Token JWT signed dan aman</li>
+                    <li>• HTTP-only cookie protection</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <button
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="w-full flex items-center justify-center px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoggingOut ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <span>Logging out...</span>
+                  </>
+                ) : (
+                  <>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    <span>Logout</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </Card>
+        </div>
+      </div>
 
       {/* Modals */}
       <ImportPatientsModal
