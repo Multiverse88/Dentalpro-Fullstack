@@ -25,15 +25,13 @@ export function Odontogram({
   onSelectionChange 
 }: OdontogramProps) {
   const [internalSelectedTeeth, setInternalSelectedTeeth] = useState<number[]>([]);
-  const [lastUpdate, setLastUpdate] = useState<number>(Date.now());
   
   // Use external selection if provided, otherwise use internal state
   const selectedTeeth = externalSelectedTeeth || internalSelectedTeeth;
   const setSelectedTeeth = onSelectionChange || setInternalSelectedTeeth;
 
-  // Update timestamp when teeth data changes to force re-render
+  // Update when teeth data changes to force re-render
   useEffect(() => {
-    setLastUpdate(Date.now());
     console.log('Odontogram updated with new teeth data:', teeth.length, 'conditions');
   }, [teeth]);
 
