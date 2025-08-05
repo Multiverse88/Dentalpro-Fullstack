@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Calendar, Clock, User, FileText } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 

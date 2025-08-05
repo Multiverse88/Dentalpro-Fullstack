@@ -25,10 +25,17 @@ interface Treatment {
   date: Date;
   type: string | null;
   description: string;
-  teeth: any;
+  teeth: number[] | string;
   notes: string | null;
   cost: number | null;
   performedBy: string | null;
+}
+
+interface ToothCondition {
+  number: number;
+  condition: 'healthy' | 'filled' | 'decayed' | 'extracted' | 'crown' | 'root_canal';
+  notes?: string;
+  lastTreatment?: Date;
 }
 
 export default function PatientDetailPage({
@@ -36,8 +43,8 @@ export default function PatientDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const [patient, setPatient] = useState<Patient | null>(null);
-  const [teethConditions, setTeethConditions] = useState<any[]>([]);
+  const [patient, setPatient] = useState<any>(null);
+  const [teethConditions, setTeethConditions] = useState<ToothCondition[]>([]);
   const [isAddTreatmentModalOpen, setIsAddTreatmentModalOpen] = useState(false);
   const [editTreatment, setEditTreatment] = useState<Treatment | null>(null);
   const [selectedTeeth, setSelectedTeeth] = useState<number[]>([]);

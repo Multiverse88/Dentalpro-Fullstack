@@ -1,4 +1,6 @@
-interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  placeholder?: string;
+}
 
 export function SearchInput({ className, ...props }: SearchInputProps) {
   return (

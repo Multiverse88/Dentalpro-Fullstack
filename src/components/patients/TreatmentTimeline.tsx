@@ -10,7 +10,7 @@ interface Treatment {
   date: Date;
   type: string | null;
   description: string;
-  teeth: any; // JSON array
+  teeth: number[] | string; // JSON array
   notes: string | null;
   cost: number | null;
   performedBy: string | null;
@@ -51,9 +51,9 @@ export function TreatmentTimeline({ treatments, patientId, onEditTreatment }: Tr
     return acc;
   }, {} as Record<string, { label: string; treatments: Treatment[] }>);
 
-  const formatTeeth = (teethData: any) => {
+  const formatTeeth = (teethData: number[] | string) => {
     try {
-      const teeth = Array.isArray(teethData) ? teethData : JSON.parse(teethData);
+      const teeth = Array.isArray(teethData) ? teethData : JSON.parse(teethData as string);
       return teeth.join(', ');
     } catch {
       return 'Tidak diketahui';

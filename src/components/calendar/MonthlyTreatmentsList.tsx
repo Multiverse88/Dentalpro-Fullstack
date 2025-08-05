@@ -149,7 +149,7 @@ export function MonthlyTreatmentsList({ treatments, title = "Daftar Perawatan" }
                 {/* Treatments List */}
                 {isExpanded && (
                   <div className="p-4 space-y-3">
-                    {dayTreatments.map((treatment, index) => (
+                    {dayTreatments.map((treatment) => (
                       <div 
                         key={treatment.id}
                         className="border border-gray-100 rounded-lg p-4 hover:shadow-md transition-shadow"

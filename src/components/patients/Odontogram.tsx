@@ -259,7 +259,6 @@ export function Odontogram({
 
   const getToothPosition = (number: number): string => {
     const tens = Math.floor(number / 10);
-    const units = number % 10;
     
     let quadrant = '';
     switch (tens) {

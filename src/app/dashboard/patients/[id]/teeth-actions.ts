@@ -41,7 +41,7 @@ export async function getPatientTeethConditions(patientId: string) {
 
         console.log('Parsed teeth:', teeth);
 
-        teeth.forEach((toothNumber: any) => {
+        teeth.forEach((toothNumber: number | string) => {
           // Convert to number if it's a string
           const toothNum = typeof toothNumber === 'string' ? parseInt(toothNumber, 10) : toothNumber;
           

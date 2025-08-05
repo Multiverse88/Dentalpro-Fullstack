@@ -11,9 +11,9 @@ export default async function TreatmentDetailPage({
   const { id, treatmentId } = await params;
   const treatment = await getTreatmentById(id, treatmentId);
 
-  const formatTeeth = (teethData: any) => {
+  const formatTeeth = (teethData: unknown) => {
     try {
-      const teeth = Array.isArray(teethData) ? teethData : JSON.parse(teethData);
+      const teeth = Array.isArray(teethData) ? teethData : JSON.parse(teethData as string);
       return teeth;
     } catch {
       return [];

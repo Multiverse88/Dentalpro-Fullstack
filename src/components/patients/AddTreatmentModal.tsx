@@ -9,7 +9,7 @@ interface Treatment {
   date: Date;
   type: string | null;
   description: string;
-  teeth: any;
+  teeth: number[] | string;
   notes: string | null;
   cost: number | null;
 }

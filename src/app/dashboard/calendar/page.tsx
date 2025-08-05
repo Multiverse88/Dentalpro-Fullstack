@@ -5,7 +5,7 @@ import { CalendarView } from '@/components/calendar/CalendarView';
 import { MonthlyTreatmentsList } from '@/components/calendar/MonthlyTreatmentsList';
 import { getTreatmentsByMonth } from './actions';
 import { Card } from '@/components/ui/Card';
-import { Calendar, TrendingUp, Users, Clock, Grid, List } from 'lucide-react';
+import { Calendar, TrendingUp, Grid, List } from 'lucide-react';
 
 interface Treatment {
   id: string;

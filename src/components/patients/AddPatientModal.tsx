@@ -96,7 +96,7 @@ export function AddPatientModal({ isOpen, onClose, onPatientAdded }: AddPatientM
         throw new Error(errorData.error || 'Gagal menambahkan pasien');
       }
 
-      const result = await response.json();
+      await response.json();
 
       // Show success toast
       showToast({
