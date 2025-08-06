@@ -27,12 +27,6 @@ export default function Sidebar() {
       color: 'from-purple-400 to-purple-600'
     },
     {
-      href: '/dashboard/appointments',
-      title: 'Jadwal',
-      icon: Clock,
-      color: 'from-orange-400 to-orange-600'
-    },
-    {
       href: '/dashboard/settings',
       title: 'Pengaturan',
       icon: Settings,
