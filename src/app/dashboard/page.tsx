@@ -61,7 +61,7 @@ export default async function DashboardPage() {
       bgGradient: "from-green-50 to-emerald-50"
     },
     {
-      title: "Janji Temu Hari Ini",
+      title: "Treatment Hari Ini",
       value: todayAppointments,
       icon: "📅",
       gradient: "from-purple-500 to-pink-500",
